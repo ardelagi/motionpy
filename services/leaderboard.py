@@ -124,7 +124,7 @@ class LeaderboardManager:
             
             embed.add_field(
                 name="🔄 Last Updated",
-                value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:R>",
+                value=f"<t:{int(datetime.now().timestamp())}:R>",
                 inline=True
             )
             
@@ -237,7 +237,7 @@ class LeaderboardManager:
             
             embed.add_field(
                 name="📅 Last Seen",
-                value=f"<t:{int(player.get('lastSeen', datetime.utcnow()).timestamp())}:R>",
+                value=f"<t:{int(player.get('lastSeen', datetime.now()).timestamp())}:R>",
                 inline=True
             )
             
@@ -351,7 +351,7 @@ class LeaderboardManager:
                 'top_player': top_player,
                 'total_server_playtime': stats.get('total_playtime', 0),
                 'average_playtime': stats.get('avg_playtime', 0),
-                'generated_at': datetime.utcnow()
+                'generated_at': datetime.now()
             }
             
         except Exception as e:
