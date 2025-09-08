@@ -51,7 +51,7 @@ def calculate_percentage(value: float, total: float) -> float:
 
 def format_timestamp(timestamp: datetime) -> str:
     """Format timestamp to readable string"""
-    now = datetime.utcnow()
+    now = datetime.now()
     diff = now - timestamp
     
     if diff.days > 0:
@@ -128,7 +128,7 @@ def create_embed_template(title: str, color: discord.Color = discord.Color.blue(
     embed = discord.Embed(
         title=title,
         color=color,
-        timestamp=datetime.utcnow()
+        timestamp=datetime.now()
     )
     embed.set_footer(text="Motionlife Roleplay", icon_url="https://i.imgur.com/your-server-icon.png")
     return embed
@@ -145,7 +145,7 @@ def calculate_uptime_percentage(total_checks: int, successful_checks: int) -> fl
 
 def get_time_ago(timestamp: datetime) -> str:
     """Get human-readable time ago string"""
-    now = datetime.utcnow()
+    now = datetime.now()
     delta = now - timestamp
     
     if delta.days > 365:
