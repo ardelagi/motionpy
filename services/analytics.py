@@ -23,7 +23,7 @@ class AnalyticsManager:
     async def update_player_data(self, players_data: List[Dict[str, Any]]):
         """Update player analytics data - FIXED VERSION"""
         try:
-            current_time = datetime.utcnow()
+            current_time = datetime.now()
             current_player_names = set()
             
             # Process current players
@@ -186,7 +186,7 @@ class AnalyticsManager:
     def _get_current_session_duration(self, player_name: str) -> int:
         """Get current session duration for online player"""
         if player_name in self.session_start_times:
-            duration = (datetime.utcnow() - self.session_start_times[player_name]).total_seconds()
+            duration = (datetime.now() - self.session_start_times[player_name]).total_seconds()
             return int(duration)
         return 0
     
@@ -224,7 +224,7 @@ class AnalyticsManager:
                 'active_players': active_players,
                 'uptime_percentage': uptime_percentage,
                 'period_days': days,
-                'generated_at': datetime.utcnow()
+                'generated_at': datetime.now()
             }
             
         except Exception as e:
@@ -277,7 +277,7 @@ class AnalyticsManager:
                 ax2.legend()
                 
                 # Format x-axis
-                ax2.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
+                ax2.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m'))
                 ax2.xaxis.set_major_locator(mdates.DayLocator())
             
             # Style the plot
@@ -291,7 +291,7 @@ class AnalyticsManager:
             plt.tight_layout()
             
             # Save graph
-            filename = f"server_stats_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            filename = f"server_stats_{datetime.now().strftime('%d%m%Y_%H%M%S')}.png"
             filepath = os.path.join('/tmp', filename)
             plt.savefig(filepath, facecolor='#2f3136', dpi=150, bbox_inches='tight')
             plt.close()
@@ -306,7 +306,7 @@ class AnalyticsManager:
         """Calculate peak players for specified period"""
         try:
             # Get historical peak from events
-            cutoff = datetime.utcnow() - timedelta(days=days)
+            cutoff = datetime.now() - timedelta(days=days)
             
             # Count concurrent players by analyzing join/leave events
             events = await self.db.get_recent_events(limit=1000)
@@ -357,7 +357,7 @@ class AnalyticsManager:
         """Calculate server uptime percentage based on successful API calls"""
         try:
             # Get ping logs as a proxy for successful API calls
-            cutoff = datetime.utcnow() - timedelta(days=days)
+            cutoff = datetime.now() - timedelta(days=days)
             
             # Expected number of updates (every 30 seconds)
             expected_updates = (days * 24 * 60 * 60) / 30
@@ -380,7 +380,7 @@ class AnalyticsManager:
     async def _get_historical_ping_data(self, days: int) -> List[Dict[str, Any]]:
         """Get historical ping data for graphing"""
         try:
-            cutoff = datetime.utcnow() - timedelta(days=days)
+            cutoff = datetime.now() - timedelta(days=days)
             
             # Get hourly ping averages
             pipeline = [
@@ -491,7 +491,7 @@ class AnalyticsManager:
     async def clean_offline_players(self):
         """Clean up offline players from current tracking"""
         try:
-            current_time = datetime.utcnow()
+            current_time = datetime.now()
             offline_threshold = timedelta(minutes=2)  # Players offline for 2+ minutes
             
             offline_players = []
@@ -527,7 +527,7 @@ class AnalyticsManager:
     
     def get_current_online_players(self) -> List[Dict[str, Any]]:
         """Get list of currently online players"""
-        current_time = datetime.utcnow()
+        current_time = datetime.now()
         return [
             {
                 'name': name,
@@ -548,7 +548,7 @@ class AnalyticsManager:
                 
                 # Calculate current session time
                 if player_name in self.session_start_times:
-                    session_time = int((datetime.utcnow() - self.session_start_times[player_name]).total_seconds())
+                    session_time = int((datetime.now() - self.session_start_times[player_name]).total_seconds())
                 else:
                     session_time = 0
                 
@@ -574,7 +574,7 @@ class AnalyticsManager:
     async def get_session_statistics(self) -> Dict[str, Any]:
         """Get current session statistics"""
         try:
-            current_time = datetime.utcnow()
+            current_time = datetime.now()
             online_players = self.get_current_online_players()
             
             if not online_players:
