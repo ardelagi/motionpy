@@ -166,7 +166,7 @@ class FiveMAPI:
     async def get_server_status(self) -> Optional[Dict[str, Any]]:
         """Get server status from /dynamic.json"""
         try:
-            start_time = datetime.utcnow()
+            start_time = datetime.now()
             data = await self._make_request('/dynamic.json')
             end_time = datetime.utcnow()
             
@@ -300,7 +300,7 @@ class FiveMAPI:
                     'players': [],
                     'resources': [],
                     'server_vars': {},
-                    'timestamp': datetime.utcnow().isoformat()
+                    'timestamp': datetime.now().isoformat()
                 }
             
             # Server is online, get additional data
@@ -333,7 +333,7 @@ class FiveMAPI:
                 'players': players_data or [],
                 'resources': info_data.get('resources', []) if info_data else [],
                 'server_vars': info_data.get('vars', {}) if info_data else {},
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now().isoformat()
             }
             
         except Exception as e:
@@ -359,9 +359,9 @@ class FiveMAPI:
         
         for name, endpoint in endpoints.items():
             try:
-                start_time = datetime.utcnow()
+                start_time = datetime.now()
                 data = await self._make_request(endpoint)
-                end_time = datetime.utcnow()
+                end_time = datetime.now()
                 
                 response_time = (end_time - start_time).total_seconds() * 1000
                 
