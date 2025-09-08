@@ -143,9 +143,9 @@ class MotionlifeBot(commands.Bot):
                 # Server is offline
                 self.server_status.update({
                     'online': False,
-                    'hostname': 'Motionlife RP',
+                    'hostname': 'Motionlife Roleplay',
                     'clients': 0,
-                    'maxClients': 128,
+                    'maxClients': 0,
                     'ping': 0
                 })
                 self.players_data = []
@@ -234,7 +234,7 @@ class MotionlifeBot(commands.Bot):
             await self.analytics_manager.clean_offline_players()
             
             # Clean old database records (daily at midnight)
-            current_hour = datetime.utcnow().hour
+            current_hour = datetime.now().hour
             if current_hour == 0:  # Midnight UTC
                 await self.db_manager.cleanup_old_data()
                 logger.info("Performed daily database cleanup")
@@ -248,11 +248,11 @@ class MotionlifeBot(commands.Bot):
             messages = []
             
             # Basic server info
-            hostname = self.server_status.get('hostname', 'Motionlife RP')
+            hostname = self.server_status.get('hostname', 'Motionlife Roleplay')
             clients = self.server_status.get('clients', 0)
-            max_clients = self.server_status.get('maxClients', 128)
+            max_clients = self.server_status.get('maxClients', 0)
             
-            messages.append(f"{clients}/{max_clients} Players Online")
+            messages.append(f"{clients}/{max_clients} Players On {hostname}")
             
             # Ping statistics
             if hasattr(self.analytics_manager, 'get_ping_stats'):
@@ -269,9 +269,6 @@ class MotionlifeBot(commands.Bot):
                     top_names = [player.get('name', 'Unknown')[:15] for player in top_players]
                     messages.append(f"Top Players: {', '.join(top_names)}")
             
-            # Server info
-            messages.append(f"Welcome to {hostname}")
-            
             # Current session stats
             if hasattr(self.analytics_manager, 'get_session_statistics'):
                 session_stats = await self.analytics_manager.get_session_statistics()
@@ -280,11 +277,11 @@ class MotionlifeBot(commands.Bot):
                     if avg_session > 60:  # More than 1 minute
                         messages.append(f"Avg Session: {format_playtime(avg_session)}")
             
-            return messages if messages else ["Motionlife RP Server"]
+            return messages if messages else ["Motionlife Roleplay"]
             
         except Exception as e:
             logger.error(f"Error generating presence messages: {e}")
-            return ["Motionlife RP Server"]
+            return ["Motionlife Roleplay"]
 
 # Slash Commands
 @discord.app_commands.describe(name="Player name to lookup")
@@ -580,7 +577,7 @@ async def online_players(interaction: discord.Interaction):
         embed = discord.Embed(
             title=f"👥 Online Players ({len(online_players)}/{bot.server_status.get('maxClients', 128)})",
             color=discord.Color.green(),
-            timestamp=datetime.now(timezone.utc)
+            timestamp=datetime.now()
         )
         
         # Sort by session duration (longest first)
@@ -648,7 +645,7 @@ async def setup_commands(bot):
     
     bot.tree.add_command(discord.app_commands.Command(
         name="server_stats", 
-        description="Show comprehensive server statistics",
+        description="Show server statistics",
         callback=server_stats
     ))
     
