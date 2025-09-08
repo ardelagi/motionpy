@@ -81,7 +81,7 @@ class DatabaseManager:
         """Insert or update player data - FIXED TO HANDLE INCREMENTAL UPDATES"""
         try:
             filter_query = {"name": player_data["name"]}
-            current_time = datetime.utcnow()
+            current_time = datetime.now()
             
             # Check if player exists
             existing_player = await self.db.players.find_one(filter_query)
@@ -166,7 +166,7 @@ class DatabaseManager:
     async def get_active_players_count(self, hours: int = 24) -> int:
         """Get count of active players in last N hours"""
         try:
-            cutoff = datetime.utcnow() - timedelta(hours=hours)
+            cutoff = datetime.now() - timedelta(hours=hours)
             count = await self.db.players.count_documents({
                 "lastSeen": {"$gte": cutoff}
             })
@@ -194,7 +194,7 @@ class DatabaseManager:
         """Log server ping data"""
         try:
             log_entry = {
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.now(),
                 "low": float(ping_data.get("low", 0)),
                 "avg": float(ping_data.get("avg", 0)),
                 "high": float(ping_data.get("high", 0)),
@@ -211,7 +211,7 @@ class DatabaseManager:
     async def get_ping_stats(self, hours: int = 24) -> Optional[Dict[str, float]]:
         """Get ping statistics for last N hours"""
         try:
-            cutoff = datetime.utcnow() - timedelta(hours=hours)
+            cutoff = datetime.now() - timedelta(hours=hours)
             
             pipeline = [
                 {"$match": {"timestamp": {"$gte": cutoff}}},
@@ -247,7 +247,7 @@ class DatabaseManager:
         """Log player events (join/leave) with enhanced data"""
         try:
             event_entry = {
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.now(),
                 "event_type": event_type,
                 "player_name": player_name,
                 "details": details or {}
@@ -299,14 +299,14 @@ class DatabaseManager:
     async def save_daily_stats(self, stats_data: Dict[str, Any]) -> bool:
         """Save daily server statistics"""
         try:
-            today = datetime.utcnow()
+            today = datetime.now()
             today_start = datetime(today.year, today.month, today.day)
             
             filter_query = {"date": today_start}
             update_data = {
                 "$set": {
                     "date": today_start,
-                    "timestamp": datetime.utcnow(),
+                    "timestamp": datetime.now(),
                     **stats_data
                 }
             }
@@ -326,7 +326,7 @@ class DatabaseManager:
     async def get_stats_history(self, days: int = 7) -> List[Dict[str, Any]]:
         """Get server statistics history"""
         try:
-            cutoff = datetime.utcnow() - timedelta(days=days)
+            cutoff = datetime.now() - timedelta(days=days)
             cutoff_start = datetime(cutoff.year, cutoff.month, cutoff.day)
             
             cursor = self.db.server_stats.find({
@@ -344,7 +344,7 @@ class DatabaseManager:
     async def get_server_analytics(self, days: int = 7) -> Dict[str, Any]:
         """Get comprehensive server analytics"""
         try:
-            cutoff = datetime.utcnow() - timedelta(days=days)
+            cutoff = datetime.now() - timedelta(days=days)
             
             # Get player statistics
             player_pipeline = [
@@ -384,7 +384,7 @@ class DatabaseManager:
                 "ping_stats": ping_stats or {},
                 "event_stats": {stat["_id"]: stat["count"] for stat in event_stats},
                 "period_days": days,
-                "generated_at": datetime.utcnow()
+                "generated_at": datetime.now()
             }
             
         except Exception as e:
@@ -394,7 +394,7 @@ class DatabaseManager:
     async def get_player_count_over_time(self, hours: int = 24) -> List[Dict[str, Any]]:
         """Get player count changes over time"""
         try:
-            cutoff = datetime.utcnow() - timedelta(hours=hours)
+            cutoff = datetime.now() - timedelta(hours=hours)
             
             # Get join/leave events grouped by hour
             pipeline = [
@@ -444,19 +444,19 @@ class DatabaseManager:
         """Clean up old data based on retention policies"""
         try:
             # Clean up old ping logs (older than 30 days)
-            ping_cutoff = datetime.utcnow() - timedelta(days=30)
+            ping_cutoff = datetime.now() - timedelta(days=30)
             ping_result = await self.db.ping_logs.delete_many({
                 "timestamp": {"$lt": ping_cutoff}
             })
             
             # Clean up old event logs (older than 90 days)
-            event_cutoff = datetime.utcnow() - timedelta(days=90)
+            event_cutoff = datetime.now() - timedelta(days=90)
             event_result = await self.db.event_logs.delete_many({
                 "timestamp": {"$lt": event_cutoff}
             })
             
             # Update players who haven't been seen in 30 days (mark as inactive)
-            inactive_cutoff = datetime.utcnow() - timedelta(days=30)
+            inactive_cutoff = datetime.now() - timedelta(days=30)
             inactive_result = await self.db.players.update_many(
                 {"lastSeen": {"$lt": inactive_cutoff}},
                 {"$set": {"status": "inactive"}}
@@ -485,12 +485,12 @@ class DatabaseManager:
             
             # Get recent activity
             recent_events = await self.db.event_logs.count_documents({
-                "timestamp": {"$gte": datetime.utcnow() - timedelta(hours=1)}
+                "timestamp": {"$gte": datetime.now() - timedelta(hours=1)}
             })
             
             # Check for recent player activity
             active_players = await self.db.players.count_documents({
-                "lastSeen": {"$gte": datetime.utcnow() - timedelta(hours=24)}
+                "lastSeen": {"$gte": datetime.now() - timedelta(hours=24)}
             })
             
             return {
@@ -504,7 +504,7 @@ class DatabaseManager:
                     "events_last_hour": recent_events,
                     "active_players_24h": active_players
                 },
-                "timestamp": datetime.utcnow()
+                "timestamp": datetime.now()
             }
             
         except Exception as e:
@@ -512,7 +512,7 @@ class DatabaseManager:
             return {
                 "status": "unhealthy",
                 "error": str(e),
-                "timestamp": datetime.utcnow()
+                "timestamp": datetime.now()
             }
     
     async def get_player_search(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
