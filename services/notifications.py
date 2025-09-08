@@ -38,7 +38,7 @@ class NotificationManager:
             self.previous_players = current_players.copy()
             
             # Update join times for current players
-            current_time = datetime.utcnow()
+            current_time = datetime.now()
             for player_name in current_players:
                 if player_name not in self.player_join_times:
                     self.player_join_times[player_name] = current_time
@@ -85,7 +85,7 @@ class NotificationManager:
             session_duration = 0
             if player_name in self.player_join_times:
                 join_time = self.player_join_times[player_name]
-                session_duration = (datetime.utcnow() - join_time).total_seconds()
+                session_duration = (datetime.now() - join_time).total_seconds()
             
             # Get player data from database for additional info
             player_db_data = await self.bot.db_manager.get_player(player_name)
@@ -110,7 +110,7 @@ class NotificationManager:
             embed = discord.Embed(
                 title="🟢 Player Joined",
                 color=discord.Color.green(),
-                timestamp=datetime.now(timezone.utc)
+                timestamp=datetime.now()
             )
             
             ping = player_data.get('ping', 0)
@@ -132,7 +132,7 @@ class NotificationManager:
             
             embed.add_field(
                 name="🕐 Time",
-                value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:T>",
+                value=f"<t:{int(datetime.now().timestamp())}:T>",
                 inline=True
             )
             
@@ -177,7 +177,7 @@ class NotificationManager:
             embed = discord.Embed(
                 title="🔴 Player Left",
                 color=discord.Color.red(),
-                timestamp=datetime.now(timezone.utc)
+                timestamp=datetime.now()
             )
             
             embed.add_field(
@@ -197,7 +197,7 @@ class NotificationManager:
             
             embed.add_field(
                 name="🕐 Time",
-                value=f"<t:{int(datetime.now(timezone.utc).timestamp())}:T>",
+                value=f"<t:{int(datetime.now().timestamp())}:T>",
                 inline=True
             )
             
@@ -266,7 +266,7 @@ class NotificationManager:
                     title="🟢 Server Online",
                     description="The server is now online and accepting connections.",
                     color=discord.Color.green(),
-                    timestamp=datetime.now(timezone.utc)
+                    timestamp=datetime.now()
                 )
                 
                 if details:
@@ -287,7 +287,7 @@ class NotificationManager:
                     title="🔴 Server Offline",
                     description="The server is currently offline or unreachable.",
                     color=discord.Color.red(),
-                    timestamp=datetime.now(timezone.utc)
+                    timestamp=datetime.now()
                 )
                 
             elif status == "maintenance":
@@ -295,13 +295,13 @@ class NotificationManager:
                     title="⚙️ Server Maintenance",
                     description="The server is in maintenance mode with low player count.",
                     color=discord.Color.orange(),
-                    timestamp=datetime.now(timezone.utc)
+                    timestamp=datetime.now()
                 )
                 
                 if details:
                     embed.add_field(
                         name="👥 Players",
-                        value=f"{details.get('clients', 0)}/{details.get('maxClients', 128)}",
+                        value=f"{details.get('clients', 0)}/{details.get('maxClients', 0)}",
                         inline=True
                     )
             
@@ -327,7 +327,7 @@ class NotificationManager:
             embed = discord.Embed(
                 title="🎉 Milestone Achievement!",
                 color=discord.Color.gold(),
-                timestamp=datetime.now(timezone.utc)
+                timestamp=datetime.now()
             )
             
             if milestone_type == "playtime_hours":
@@ -358,14 +358,14 @@ class NotificationManager:
             embed = discord.Embed(
                 title=f"📊 Player Activity Summary ({period_hours}h)",
                 color=discord.Color.blue(),
-                timestamp=datetime.now(timezone.utc)
+                timestamp=datetime.now()
             )
             
             # Get recent events
             recent_events = await self.bot.db_manager.get_recent_events(limit=100)
             
             # Filter events by time period
-            cutoff_time = datetime.utcnow() - timedelta(hours=period_hours)
+            cutoff_time = datetime.now() - timedelta(hours=period_hours)
             period_events = [
                 event for event in recent_events 
                 if event.get('timestamp', datetime.min) >= cutoff_time
@@ -446,7 +446,7 @@ class NotificationManager:
                 title=title,
                 description=description,
                 color=color,
-                timestamp=datetime.now(timezone.utc)
+                timestamp=datetime.now()
             )
             
             if fields:
